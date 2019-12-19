@@ -1,0 +1,248 @@
+<html>
+{{>head}}
+<script>
+    $(function () {
+        $("#datepicker").datepicker();
+
+    });
+    $(function () {
+        $("#datepicker2").datepicker();
+    });
+    
+</script>
+
+<body>
+    <h2 class="text-center">Comparison of Forecast & Actual data</h2>
+    <hr>
+    <div class="container">
+        <form action="" method="GET">
+            <input type="checkbox" name="provider" id="iitm" value="IITM" checked>IITM
+            <input type="checkbox" name="provider" id="ecmwf" value="ECMWF" checked>ECMWF
+            <input type="checkbox" name="provider" id="actual" value="ACTUAL" checked>ACTUAL
+            
+        <br>
+            
+                <input type="radio" name="parameter" id="wind" value="wind" checked>Wind
+                <input type="radio" name="parameter" id="solar" value="solar">Solar
+                <input type="radio" name="parameter" id="temperature" value="temperature">temperature
+                <input type="radio" name="parameter" id="humidity" value="humidity">humidity
+            
+        
+    <br>
+            <input type="radio" name="owner" id="" value="ostro" checked>Ostro
+            <input type="radio" name="owner" id="" value="arinsun" >Arinsun
+            <input type="radio" name="owner" id="" value="mahindra" >Mahindra
+            <input type="radio" name="owner" id="" value="acme" >Acme
+
+
+           
+            <input type="text" id="datepicker" class="col s1 offset-s4" placeholder="Select Date" name="fromdate"
+                autocomplete="off" required oninput="saveValue(this)">
+            {{!-- <input type="text" id="datepicker2" class="col s1 " placeholder="To Date" name="todate" autocomplete="off"> --}}
+
+            
+                
+                    <input type="submit" id="submit">
+
+               
+            </form>
+            
+        </div>
+            
+    </div>
+    {{!-- <div class="container border">
+        {{#if status}}
+        <div class="row"><button class="btn btn-primary"  >
+            <a href="" download="mydata.csv"></a> Download Data</button></div>
+        {{else}}
+        <div class="row">{{message}}</div>
+        {{/if}}
+    </div> --}}
+    <div id="myplot"></div>
+    <div id="generationPlot"></div>
+    <script>
+        yaxisIITM = [{{data.IITM.value}}]
+        xaxisIITM = [{{data.IITM.index}}]
+        var IITM = {
+  x: xaxisIITM,
+  y: yaxisIITM,
+  type: 'scatter',
+  name:'IITM',
+  marker:{
+      color:'rgb(0,123,255)'
+  }
+};
+var IITMDataReliable = true;
+yaxisIITM.forEach( (entry) => {
+if(isNaN(entry)){
+       IITMDataReliable = false;
+    }
+})
+yaxisECMWF = [{{data.ECMWF.value}}]
+xaxixECMWF = [{{data.ECMWF.index}}]
+
+var ECMWFDataReliable = true;
+yaxisECMWF.forEach( (entry) => {
+    if(isNaN(entry)){
+       ECMWFDataReliable = false;
+    }
+})
+var ECMWF = {
+  x: xaxixECMWF,
+  y: yaxisECMWF,
+  type: 'scatter',
+  name:'ECMWF',
+  marker:{
+      color:'rgb(253,126,30)'
+  }
+};
+
+yaxisACTUAL = [{{data.ACTUAL.value}}]
+xaxisACTUAL = [{{data.ACTUAL.index}}]
+var ACTUALDataReliable = true;
+yaxisACTUAL.forEach( (entry) => {
+    if(isNaN(entry)){
+        ACTUALDataReliable = false;
+    }
+})
+var ACTUAL = {
+    x:xaxisACTUAL,
+    y:yaxisACTUAL ,
+    type: 'scatter',
+  name:'ACTUAL',
+  marker:{
+      color:'rgb(75,211,72)'
+  }
+}
+if(ECMWFDataReliable && IITMDataReliable && ACTUALDataReliable){
+    var data = [IITM,ECMWF,ACTUAL];
+}
+else if(IITMDataReliable && ACTUALDataReliable){
+    var data = [IITM,ACTUAL]
+}
+else if(ECMWFDataReliable && ACTUALDataReliable){
+    var data = [ECMWF,ACTUAL]
+}
+else if(ECMWFDataReliable && IITMDataReliable){
+    var data = [ECMWF,IITM]
+}
+else if(IITMDataReliable){
+    var data = [IITM]
+}
+else if(ECMWFDataReliable){
+    var data = [ECMWF]
+}
+else if(ACTUALDataReliable){
+    var data = [ACTUAL]
+}
+else{
+    var data = [];
+}
+var layout = {
+  title: 'Data comparison for date '+ '{{date}}' + ' for ' + '{{owner}}' ,
+  xaxis: {
+    title: 'Timeblock',
+    showgrid: true,
+    zeroline: true,
+    ticklen:8,
+    showticklabel:true
+  },
+  yaxis: {
+    title: '{{y_axis_title}}',
+    showline: false
+  },
+  legend: {
+    font: {size: 16},
+    yref: 'paper',
+    orientation:'h'
+  }
+};
+
+Plotly.newPlot('myplot', data, layout, {showSendToCloud: true});
+    </script>
+
+<script>
+    var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};
+    var parameter = getUrlParameter('parameter')
+    var provider = getUrlParameter('provider')
+    var fromdate=  getUrlParameter('fromdate')
+    var owner = getUrlParameter('owner')
+    var ajaxReq = $.ajax({
+        url:'/generation',
+        type:'GET',
+        data:jQuery.param({'parameter':parameter, 'provider':'ACTUAL' , 'fromdate':fromdate ,'owner':owner})
+    })
+    ajaxReq.done(function(data,status,xhr){
+            xaxisGeneration = data.index;
+            yaxisGeneration = data.value;
+           
+            var GenerationDataReliable = true;
+yaxisGeneration.forEach( (entry) => {
+    if(isNaN(entry)){
+        GenerationDataReliable = false;
+    }
+})
+var generation = {
+    x:xaxisGeneration,
+    y:yaxisGeneration ,
+    type: 'scatter',
+  name:'generation',
+  
+}
+var dataGeneration = [generation]
+var layout = {
+  title: 'Actual Generation for '+ '{{date}}' + ' for ' + '{{owner}}' ,
+  xaxis: {
+    title: 'Timeblock',
+    showgrid: true,
+    zeroline: true,
+    ticklen:8,
+    showticklabel:true
+  },
+  yaxis: {
+    title: 'MW',
+    showline: false
+  },
+  legend: {
+    font: {size: 16},
+    yref: 'paper'
+  }
+}
+Plotly.newPlot('generationPlot', dataGeneration, layout, {showSendToCloud: true});
+
+
+        
+    } );
+</script>
+
+
+    <script>
+        function downloadToCSV(csvData){
+            csvData = 5;
+            encodeURI = encodeURI(csvData)
+            window.open(encodeURI);
+        }
+        function saveValue(e){
+        console.log(e)
+        var id = e.id;
+        var value = id.value;
+        localStorage.setItem(id,value);
+        console.log('The id is ',id,' the value is ',value)
+    }
+    </script>
+</body>
+
+</html>
