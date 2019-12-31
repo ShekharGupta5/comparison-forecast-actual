@@ -22,17 +22,17 @@
             
         <br>
             
-                <input type="radio" name="parameter" id="wind" value="wind" checked>Wind
+                <input type="radio" name="parameter" id="wind" value="wind" >Wind
                 <input type="radio" name="parameter" id="solar" value="solar">Solar
-                <input type="radio" name="parameter" id="temperature" value="temperature">temperature
-                <input type="radio" name="parameter" id="humidity" value="humidity">humidity
+                {{!-- <input type="radio" name="parameter" id="temperature" value="temperature">temperature
+                <input type="radio" name="parameter" id="humidity" value="humidity">humidity --}}
             
         
     <br>
-            <input type="radio" name="owner" id="" value="ostro" checked>Ostro
-            <input type="radio" name="owner" id="" value="arinsun" >Arinsun
-            <input type="radio" name="owner" id="" value="mahindra" >Mahindra
-            <input type="radio" name="owner" id="" value="acme" >Acme
+            <input type="radio" name="owner" id="ostro" value="ostro" >Ostro
+            <input type="radio" name="owner" id="arinsun" value="arinsun" >Arinsun
+            <input type="radio" name="owner" id="mahindra" value="mahindra" >Mahindra
+            <input type="radio" name="owner" id="acme" value="acme" >Acme
 
 
            
@@ -42,7 +42,7 @@
 
             
                 
-                    <input type="submit" id="submit">
+                    <input type="submit" id="submit" >
 
                
             </form>
@@ -242,6 +242,19 @@ Plotly.newPlot('generationPlot', dataGeneration, layout, {showSendToCloud: true}
         localStorage.setItem(id,value);
         console.log('The id is ',id,' the value is ',value)
     }
+    </script>
+    <script>
+        function FillFormValues(){
+        var parameter = getUrlParameter('parameter')
+    var provider = getUrlParameter('provider')
+    var fromdate=  getUrlParameter('fromdate')
+    var owner = getUrlParameter('owner')
+    $('#'+parameter).prop('checked',true);
+    $('#datepicker').val(fromdate)
+    $('#'+owner).prop('checked',true);
+    }
+
+    FillFormValues()
     </script>
 </body>
 

@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 import os,shutil
 
-date = datetime.now()
+date = datetime.now() - timedelta(days=1)
 year = date.year
 month = date.month
 day = date.day

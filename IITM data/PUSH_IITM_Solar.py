@@ -47,7 +47,7 @@ for station  in range(45,48):
             "owner":owner,
             "parameter":"solar"
         }
-
+        
         objectData.append(obj)
     
 

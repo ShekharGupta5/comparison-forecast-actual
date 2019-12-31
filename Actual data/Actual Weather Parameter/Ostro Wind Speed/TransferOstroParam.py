@@ -17,8 +17,13 @@ fileName = "OSTRO_MPS_" + date_string + '.xlsx'
 RemoteFilePath = '\\\\10.2.100.51\scada\Reports\Renewable_MPS\OSTRO'
 files = os.listdir(RemoteFilePath)
 
+fileFound = False
 for f in files:
     if(f == fileName):
         localFileName = os.path.join('D:\Software\Forecasting DB\Actual data\Actual Weather Parameter\Ostro Wind Speed',fileName)
         shutil.copyfile(RemoteFilePath+'\\'+f,localFileName)
-        
+        fileFound = True
+    
+
+if(not fileFound):
+    print('File is not present in scada 51 server.')

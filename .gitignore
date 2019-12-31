@@ -1,0 +1,8 @@
+node_modules/
+*.csv
+*.xlsx
+*.pptx
+*.docx
+*.xml
+*.pdf
+Cities/Forecast folder/
