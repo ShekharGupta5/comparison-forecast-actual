@@ -1,6 +1,8 @@
 from datetime import date
-import os,shutil
-today =  date.today().strftime('%Y%m%d')
+import os,shutil,sys
+
+
+today = date.today().strftime('%Y%m%d')
 
 os.system('python IITMFTPTransfer.py '+today)
 os.system('python PUSH_IITM_Solar.py '+today)

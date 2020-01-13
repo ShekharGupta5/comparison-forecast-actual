@@ -13,7 +13,7 @@ import sys
 
 # date_string = str(day)+'_'+str(month)+'_'+str(year)
 date_string = sys.argv[1]
-fileName = "OSTRO_MPS_" + date_string + '.xlsx'
+fileName = "OSTRO_MPS_" + date_string + '.csv'
 RemoteFilePath = '\\\\10.2.100.51\scada\Reports\Renewable_MPS\OSTRO'
 files = os.listdir(RemoteFilePath)
 

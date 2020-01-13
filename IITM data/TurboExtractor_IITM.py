@@ -36,7 +36,7 @@ for station in range(1,370):
     else:
         name = base+ str(station) + '.csv'
     
-
+    
     fyle = open(name)
     
     #print('File ',name,' is open and working...')
@@ -56,7 +56,11 @@ for station in range(1,370):
         HumiditySheet.cell(row,1).value = dateValue
         WindSheet.cell(row,station+1).value = float(dataParts[2])
         TemperatureSheet.cell(row,station+1).value = float(dataParts[3])
-        HumiditySheet.cell(row,station+1).value = float(dataParts[4])
+        try:
+            humidiyValue = float(dataParts[4])
+        except:
+            humidiyValue = 0
+        HumiditySheet.cell(row,station+1).value = humidiyValue
     
 
 

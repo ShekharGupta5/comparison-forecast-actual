@@ -12,11 +12,9 @@ if(month<10):
     month = '0'+str(month)
 
 date_string = str(day)+'_'+str(month)+'_'+str(year)
-
-
+# date_string = '12_01_2020'
 os.system('python ActualGenerationTransfer.py '+date_string)
 os.system('python PushGenerationAll.py '+date_string)
-
 fileCreated = 'RENEWABLE_CS_' + date_string+ '.xlsx'
 
 shutil.move(fileCreated,'./PushedSheets to db/')

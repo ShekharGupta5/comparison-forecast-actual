@@ -13,6 +13,8 @@ if(month<10):
 date_string = str(day)+'_'+str(month)+'_'+str(year)
 
 
+# date_string = '12_01_2020'
+
 baseDirectory = os.getcwd()
 ################# For GHI ##########################
 ghiFilePath = os.path.join(baseDirectory,'Actual GHIParameter')
@@ -34,7 +36,7 @@ os.chdir(ostroFilePath)
 os.system('python TransferOstroParam.py '+date_string)
 os.system('python PUSHDataActual.py '+date_string)
 
-fileCreatedSolar = 'OSTRO_MPS_' + date_string + '.xlsx'
+fileCreatedSolar = 'OSTRO_MPS_' + date_string + '.csv'
 
 shutil.move(fileCreatedSolar,'PushedSheets to db/')
 

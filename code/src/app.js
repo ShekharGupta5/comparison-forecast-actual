@@ -17,6 +17,13 @@ hbs.registerHelper('check',function(value){
         return 'i aogt the status code '
     }
 })
+hbs.registerHelper('upperFirst',function(value){
+    if(value == undefined){
+        return null;
+    }
+    return value.charAt(0).toUpperCase() + value.slice(1) ;
+})
+
 const general = require('./routes/RouteGeneral')
 const generation = require('./routes/RouteGeneration')
 

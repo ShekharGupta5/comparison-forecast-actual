@@ -4,35 +4,55 @@ from datetime import datetime
 import pymongo
 import sys
 
+sys.path.append('D://Software//Forecasting DB//code//src//database')
+
+import DatabaseSelector
+dbName = DatabaseSelector.DatabaseName(sys.argv[1],provider='ACTUAL')
+print('The Records are inserted in ',dbName)
 
 myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
 mydb = myclient['ForecastingDB']
-collection = mydb['forecastings']
+collection = mydb[dbName]
 
 date = sys.argv[1]
 
-path =  'OSTRO_MPS_' + date+ '.xlsx'
 
-wb = load_workbook(path)
-ws = wb.active
+
+path =  'OSTRO_MPS_' + date+ '.csv'
+
+fyle = open(path)
 allData = []
 
-for col in range(2,ws.max_column+1):
-    lid = ws.cell(2,col).value   
-    for row in range(3,ws.max_row):
-        timestamp = ws.cell(row,1).value
-        date = datetime.strptime(timestamp,"%d-%m-%Y %H:%M:%S")
-        data = ws.cell(row,col).value
+for row in fyle:
+    allData.append(row)
+
+columnHeads = []
+filteredDataArray = []
+for i in range(1,2):
+    columnHeadsArray = allData[i].split(',')
+    for eachHead in columnHeadsArray:
+        if(eachHead == 'Timestamp'):
+            ignore = True
+        else:
+            columnHeads.append(eachHead)
+
+for i in range(2,98):
+    dataParts = allData[i].split(',')
+    timestamp = datetime.strptime(dataParts[0],"%d-%m-%Y %H:%M:%S")
+    # dataParts.remove(timestamp)
+    
+    for j in range(1,len(columnHeads)+1):
         obj = {
-        "timestamp":date,
-        "value":data,
-        "id":lid,
+        "timestamp":timestamp,
+        "value":dataParts[j],
+        "id":'Ostro_Mps'+str(j),
         "provider":"ACTUAL",
         "owner":'ostro',
         "parameter":'wind'
         }
-        allData.append(obj)
-        
+        filteredDataArray.append(obj)
 
-collection.insert_many(allData)
-print('Total ',len(allData),' documents inserted in forecasting database.')
+# print(filteredDataArray)
+
+collection.insert_many(filteredDataArray)
+print('Total ',len(filteredDataArray),' documents inserted in forecasting database.')

@@ -6,7 +6,7 @@ const express = require('express');
 
 
 
-const Fetcher = require('../fetch/Fetcher')
+
 const { convertArrayToCSV } = require('convert-array-to-csv');
 
 
@@ -36,7 +36,7 @@ router.get('', (req, res) => {
     if(owner == undefined || owner == null){
         owner = '';
     }
-    
+    const Fetcher = require('../fetch/Fetcher')
     Fetcher.FetchGenerationData(fromdate,parameter,provider,owner).then( (result) => {
             // res.render('dashboard', {
             //     status:200,

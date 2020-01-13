@@ -4,10 +4,19 @@ from datetime import datetime,timedelta
 import pymongo
 import sys
 import owner_solar
+sys.path.append('D://Software//Forecasting DB//code//src//database')
+
+#As we are forecasting for a day ahead and the file name is of d-1 so 
+#it is causing error , so will give a date d+1 for dabasename function
+dayAhead = datetime.strptime(sys.argv[1],"%Y%m%d") + timedelta(days=1)
+dayAheadString = datetime.strftime(dayAhead,"%Y%m%d")
+import DatabaseSelector
+dbName = DatabaseSelector.DatabaseName(dayAheadString,provider='IITM')
+print('The Records are inserted in ',dbName)
 
 myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
 mydb = myclient['ForecastingDB']
-collection = mydb['forecastings']
+collection = mydb[dbName]
 
 date = sys.argv[1]
 base = 'RE Stations Forecast Folder/Solar/wrf_solar.'
@@ -52,7 +61,7 @@ for station  in range(45,48):
     
 
 collection.insert_many(objectData)
-print('Total ',len(objectData),' documents inserted in forecasting database.')
+print('Total ',len(objectData),' documents inserted in ',dbName,' database.')
 
 
         

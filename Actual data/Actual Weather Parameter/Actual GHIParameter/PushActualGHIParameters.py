@@ -5,9 +5,14 @@ import pymongo
 import sys
 
 
+sys.path.append('D://Software//Forecasting DB//code//src//database')
+
+import DatabaseSelector
+dbName = DatabaseSelector.DatabaseName(sys.argv[1],provider='ACTUAL')
+print('The Records are inserted in ',dbName)
 myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
 mydb = myclient['ForecastingDB']
-collection = mydb['forecastings']
+collection = mydb[dbName]
 
 date = sys.argv[1]
 dateParts = date.split('_')
@@ -44,6 +49,9 @@ for station in stations:
 
         if(actual_date <13 ):
             timestamp = ws.cell(row,1).value
+            
+            if(isinstance(timestamp,str)):
+                timestamp = datetime.strptime(timestamp,"%m-%d-%Y %H:%M:%S")
             year = str(timestamp.year)
             hour = str(timestamp.hour)
             minute = str(timestamp.minute) 

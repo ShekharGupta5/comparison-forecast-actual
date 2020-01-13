@@ -8,7 +8,16 @@
     $(function () {
         $("#datepicker2").datepicker();
     });
-    
+    function YAxisErrorData(actualData,forecastData){
+            tempData = []
+            for(var i=0;i<actualData.length;i++){
+                actualValue = actualData[i]
+                forecastValue = forecastData[i]
+                temp = ((actualValue - forecastValue)/  actualValue )*100;
+                tempData.push(temp)
+            }
+            return tempData;
+        }
 </script>
 
 <body>
@@ -60,6 +69,7 @@
     </div> --}}
     <div id="myplot"></div>
     <div id="generationPlot"></div>
+    <div id="errorPlot"></div>
     <script>
         yaxisIITM = [{{data.IITM.value}}]
         xaxisIITM = [{{data.IITM.index}}]
@@ -114,6 +124,7 @@ var ACTUAL = {
       color:'rgb(75,211,72)'
   }
 }
+
 if(ECMWFDataReliable && IITMDataReliable && ACTUALDataReliable){
     var data = [IITM,ECMWF,ACTUAL];
 }
@@ -139,20 +150,35 @@ else{
     var data = [];
 }
 var layout = {
-  title: 'Data comparison for date '+ '{{date}}' + ' for ' + '{{owner}}' ,
+  title:{
+      text:'Data comparison for date '+ '{{date}}' + ' for ' + '{{upperFirst owner}}',
+      font:{
+          size:24
+      }
+  },
   xaxis: {
-    title: 'Timeblock',
+    title: {
+        text:'Timeblock',
+        font:{
+            size:20
+        }
+    },
     showgrid: true,
     zeroline: true,
     ticklen:8,
     showticklabel:true
   },
   yaxis: {
-    title: '{{y_axis_title}}',
-    showline: false
+    title: {
+        text:'{{y_axis_title}}',
+        font:{
+            size:20
+        }
+    },
+    showline: true
   },
   legend: {
-    font: {size: 16},
+    font: {size: 18},
     yref: 'paper',
     orientation:'h'
   }
@@ -204,20 +230,35 @@ var generation = {
 }
 var dataGeneration = [generation]
 var layout = {
-  title: 'Actual Generation for '+ '{{date}}' + ' for ' + '{{owner}}' ,
+  title: {
+      text:'Actual Generation for '+ '{{date}}' + ' for ' + '{{upperFirst owner}}',
+      font:{
+          size:24
+      }
+  } ,
   xaxis: {
-    title: 'Timeblock',
+     title: {
+        text:'Timeblock',
+        font:{
+            size:20
+        }
+    },
     showgrid: true,
     zeroline: true,
     ticklen:8,
     showticklabel:true
   },
   yaxis: {
-    title: 'MW',
-    showline: false
+    title: {
+        text:'MW',
+        font:{
+            size:20
+        }
+    },
+    showline: true
   },
   legend: {
-    font: {size: 16},
+    font: {size: 18},
     yref: 'paper'
   }
 }
@@ -226,6 +267,54 @@ Plotly.newPlot('generationPlot', dataGeneration, layout, {showSendToCloud: true}
 
         
     } );
+</script>
+<script>
+    var IITMERROR = {
+    x:xaxisIITM,
+    y:YAxisErrorData(yaxisACTUAL,yaxisIITM),
+    type:'scatter',
+    name:'Error IITM',
+    yaxis:'y2'
+}
+var ECMWFERROR = {
+    x:xaxixECMWF,
+    y:YAxisErrorData(yaxisACTUAL,yaxisECMWF),
+    type:'scatter',
+    name:'Error ECMWF',
+    yaxis:'y2'
+}
+var data = [IITMERROR,ECMWFERROR]
+var Errorlayout = {
+  title:{
+      text:'Error plot for date '+ '{{date}}' + ' for ' + '{{upperFirst owner}}',
+      font:{
+          size:24
+      }
+  },
+  xaxis: {
+    title: {
+        text:'Timeblock',
+        font:{
+            size:20
+        }
+    },
+    showgrid: true,
+    zeroline: true,
+    ticklen:8,
+    showticklabel:true
+  },
+  yaxis: {
+    title:'Error Percentage',
+    showline: true
+  },
+  legend: {
+    font: {size: 18},
+    yref: 'paper',
+    orientation:'h'
+  }
+};
+//Plotly.newPlot('errorPlot', data, Errorlayout, {showSendToCloud: true});
+//Comment out to show error plots
 </script>
 
 
@@ -255,6 +344,9 @@ Plotly.newPlot('generationPlot', dataGeneration, layout, {showSendToCloud: true}
     }
 
     FillFormValues()
+    </script>
+    <script>
+        
     </script>
 </body>
 

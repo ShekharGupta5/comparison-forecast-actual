@@ -1,6 +1,5 @@
 require('../database/mongo-connection');
 
-const ForecastModel = require('../model/ForecastModel')
 const GenerationModel = require('../model/GenerationModel')
 
 async function FetchData(fromdate,parameter,provider,owner){
@@ -8,7 +7,13 @@ async function FetchData(fromdate,parameter,provider,owner){
  aDateAgo = new Date(fromdate);
  aDateAgo.setDate(aDateAgo.getDate()+1)
  aDateAgoString = String( aDateAgo.getFullYear() + '-' +('0' + (aDateAgo.getMonth() + 1)).slice(-2)+ '-' +('0' + aDateAgo.getDate()).slice(-2) ) 
-   var result = await ForecastModel.find({
+ 
+
+ require('../model/ForecastModel').setDate(fromdate);
+   
+
+ const ForecastModel = require('../model/ForecastModel').Forecast;
+ var result = await ForecastModel().find({
        timestamp:{
            $gte:new Date(formatedStrin),
            $lt:new Date(aDateAgoString)
@@ -102,6 +107,21 @@ async function FetchGenerationData(fromdate,parameter,provider,owner){
    })
    
    return TrasnformData(result);
+}
+
+
+async function NewDbPatch(){
+    var MongoClient = require('mongodb').MongoClient;
+    var url = 'mongodb://127.0.0.1:27017/'
+    MongoClient.connect(url,function(err,db){
+        if(err)throw err;
+        var dbo = db.db('ForecastingDB')
+        dbo.collection('forecastingsJans').find({'provider':'IITM' , 'parameter':'solar' ,'owner':'arinsun' }).toArray( function(err,result){
+            if(err) throw err;
+            return result
+            
+        })
+    })
 }
 
 module.exports.FetchGenerationData = FetchGenerationData
