@@ -106,7 +106,7 @@ for station in stations:
         
 
     collection.insert_many(avg15MinBlockValue)
-    print('Total ',len(avg15MinBlockValue),' documents inserted in forecasting database.')
+    print('Total ',len(avg15MinBlockValue),' documents inserted in ',dbName, ' database. For Date ',date , ' for GHI Parameters')
 
     
     

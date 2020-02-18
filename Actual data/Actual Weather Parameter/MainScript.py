@@ -10,10 +10,14 @@ if(day<10):
 if(month<10):
     month = '0'+str(month)
 
-date_string = str(day)+'_'+str(month)+'_'+str(year)
+try:
+    date_string = sys.argv[1]
+except:
+    date_string = str(day)+'_'+str(month)+'_'+str(year)
+ 
 
 
-# date_string = '12_01_2020'
+# date_string = '03_02_2020'
 
 baseDirectory = os.getcwd()
 ################# For GHI ##########################

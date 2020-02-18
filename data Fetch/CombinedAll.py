@@ -3,7 +3,7 @@ from openpyxl import load_workbook
 
 newFileWorkBook = Workbook()
 Humidity = newFileWorkBook.active
-Humidity.title = 'Humidity'
+
 
 CombinedDataObject = {}
 

@@ -91,4 +91,4 @@ for col in range(2,6):
     #print(avg15MinBlockValue)    
 
     collection.insert_many(avg15MinBlockValue)
-    print('Total ',len(avg15MinBlockValue),' documents inserted in generations database.')
+    print('Total ',len(avg15MinBlockValue),' documents inserted in generations database. for date ',actual_date ,' for Generation.')

@@ -54,4 +54,4 @@ for sheet in sheets:
             #collection.insert_one(obj)
 
 collection.insert_many(allData)
-print('Total ',len(allData),' documents inserted in ',dbName,' database.')
+print('Total ',len(allData),' documents inserted in ',dbName,' database. These docs are for date ',date,' for ECMWF')

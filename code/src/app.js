@@ -26,9 +26,12 @@ hbs.registerHelper('upperFirst',function(value){
 
 const general = require('./routes/RouteGeneral')
 const generation = require('./routes/RouteGeneration')
+const downloadData = require('./routes/RouteDownload')
 
 app.use('/',general);
 app.use('/generation',generation)
+app.use('/downloadData',downloadData)
+
 
 app.listen(port, ()=>{
     console.log(`Server is listening on ${port} ...`);

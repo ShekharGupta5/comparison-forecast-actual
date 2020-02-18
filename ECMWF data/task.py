@@ -1,4 +1,4 @@
 import subprocess
-for i in range(21,27):
-    date = '201911' + str(i)
-    subprocess.Popen('python PushTemperature.py '+date)
+for i in range(27,32):
+    date = '202001' + str(i)
+    subprocess.Popen('python PUSHDataECMWF.py '+date)

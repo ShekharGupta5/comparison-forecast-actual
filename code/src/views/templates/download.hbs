@@ -1,0 +1,44 @@
+<html>
+    {{>head}}
+    <body>
+        <script>
+             $(function () {
+        $("#datepicker").datepicker();
+
+    });
+    $(function () {
+        $("#datepicker2").datepicker();
+    });
+        </script>
+         <div class="selectorPanel">
+    <div class="container ">
+        {{message}}
+        <form action="" method="GET">
+            
+            
+        <br>
+                <input type="radio" name="parameter" id="temperature" value="temperature">Temperature
+                <input type="radio" name="parameter" id="percipitation" value="percipitation" >Percipitation
+                <input type="radio" name="parameter" id="rain" value="rain">Rainrate
+                <input type="radio" name="parameter" id="humidity" value="humidity">Humidity
+            
+        
+    <br>
+            
+
+
+           
+            <input type="text" id="datepicker" class="col s1 offset-s4" placeholder="Select Date" name="fromdate"
+                autocomplete="off" required oninput="saveValue(this)">
+            <input type="text" id="datepicker2" class="col s1 " placeholder="To Date" name="todate" autocomplete="off">
+
+            
+                
+                    <input type="submit" id="submit" >
+
+               
+            </form>
+            
+        </div>
+    </body>
+</html>

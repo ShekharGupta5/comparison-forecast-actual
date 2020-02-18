@@ -47,6 +47,7 @@ for station in range(1,370):
 
     #### For loop for inserting data into sheet
     for row,d in zip(range(2,98),range(73,169)):
+        # print('  THe value for which it is breaking ',station)
         dataParts = allData[d].split(' ')
         dateValue = datetime.strptime(dataParts[0] +' '+ dataParts[1],"%d-%m-%Y %H:%M")
         dateValue = dateValue + timedelta(hours=5) + timedelta(minutes=30)

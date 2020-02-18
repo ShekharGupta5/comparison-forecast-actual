@@ -55,4 +55,4 @@ for i in range(2,98):
 # print(filteredDataArray)
 
 collection.insert_many(filteredDataArray)
-print('Total ',len(filteredDataArray),' documents inserted in forecasting database.')
+print('Total ',len(filteredDataArray),' documents inserted in ',dbName, ' database. For Date ',date , ' for Ostro Stations')

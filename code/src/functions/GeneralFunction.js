@@ -8,5 +8,18 @@ function Log(req,route){
     require('fs').appendFileSync('./logs/AppExecution.txt',str +'\n')
     return str;
 }
+function RMSE(actual,forecast,generationCapacity){
+    // console.log(actual,forecast)
+    squaresValues = []
+    var sums =0 ;
+    for(var i=0;i<96;i++){
+        item = Math.pow( ( (actual[i]-forecast[i]) / generationCapacity ),2 );
+        squaresValues.push(item)
+        sums = sums + item;
+    }
+    rmse = Math.sqrt(sums/96);
+    return rmse*100;
 
+}
 module.exports.Log = Log;
+module.exports.RMSE = RMSE;

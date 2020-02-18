@@ -61,7 +61,8 @@ for station  in range(45,48):
     
 
 collection.insert_many(objectData)
-print('Total ',len(objectData),' documents inserted in ',dbName,' database.')
+
+print('Total ',len(objectData),' documents inserted in ',dbName,' database. These docs are for date ',date,' for IITM Solar')
 
 
         

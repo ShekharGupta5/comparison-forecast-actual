@@ -21,9 +21,16 @@
 </script>
 
 <body>
+    <script type="text/javascript">
+    $("body").prepend('<div id="preloader">Loading...</div>');
+    $(document).ready(function() {
+        $("#preloader").remove();
+    });
+</script>
     <h2 class="text-center">Comparison of Forecast & Actual data</h2>
-    <hr>
-    <div class="container">
+    
+    <div class="selectorPanel">
+    <div class="container ">
         <form action="" method="GET">
             <input type="checkbox" name="provider" id="iitm" value="IITM" checked>IITM
             <input type="checkbox" name="provider" id="ecmwf" value="ECMWF" checked>ECMWF
@@ -57,20 +64,15 @@
             </form>
             
         </div>
-            
-    </div>
-    {{!-- <div class="container border">
-        {{#if status}}
-        <div class="row"><button class="btn btn-primary"  >
-            <a href="" download="mydata.csv"></a> Download Data</button></div>
-        {{else}}
-        <div class="row">{{message}}</div>
-        {{/if}}
-    </div> --}}
+     </div>
+     <a href="/downloadData">Download City Wise Data</a>
+    <div id="RMSE"></div>
     <div id="myplot"></div>
+    <div id="RMSE"></div>
     <div id="generationPlot"></div>
     <div id="errorPlot"></div>
     <script>
+        lineWidth = 4
         yaxisIITM = [{{data.IITM.value}}]
         xaxisIITM = [{{data.IITM.index}}]
         var IITM = {
@@ -80,6 +82,9 @@
   name:'IITM',
   marker:{
       color:'rgb(0,123,255)'
+  },
+  line:{
+      width:lineWidth
   }
 };
 var IITMDataReliable = true;
@@ -104,6 +109,9 @@ var ECMWF = {
   name:'ECMWF',
   marker:{
       color:'rgb(253,126,30)'
+  },
+  line:{
+      width:lineWidth
   }
 };
 
@@ -122,10 +130,30 @@ var ACTUAL = {
   name:'ACTUAL',
   marker:{
       color:'rgb(75,211,72)'
+  },
+  line:{
+      width:lineWidth
   }
 }
 
+yaxixMyForecast = [{{data.MYForecast.value}}]
+xaxisMyForecast = [{{data.MYForecast.index}}]
+var MYForecast = {
+    x:xaxisMyForecast,
+    y:yaxixMyForecast,
+    type: 'scatter',
+  name:'MyForecast',
+  marker:{
+      color:'rgb(195,155,211)'
+  },
+  line:{
+      width:lineWidth
+  }
+
+}
+
 if(ECMWFDataReliable && IITMDataReliable && ACTUALDataReliable){
+    //var data = [IITM,ECMWF,ACTUAL,MYForecast];
     var data = [IITM,ECMWF,ACTUAL];
 }
 else if(IITMDataReliable && ACTUALDataReliable){
@@ -138,13 +166,13 @@ else if(ECMWFDataReliable && IITMDataReliable){
     var data = [ECMWF,IITM]
 }
 else if(IITMDataReliable){
-    var data = [IITM]
+    var data = [IITM,MYForecast]
 }
 else if(ECMWFDataReliable){
-    var data = [ECMWF]
+    var data = [ECMWF,MYForecast]
 }
 else if(ACTUALDataReliable){
-    var data = [ACTUAL]
+    var data = [ACTUAL,MYForecast]
 }
 else{
     var data = [];
@@ -212,9 +240,13 @@ Plotly.newPlot('myplot', data, layout, {showSendToCloud: true});
         data:jQuery.param({'parameter':parameter, 'provider':'ACTUAL' , 'fromdate':fromdate ,'owner':owner})
     })
     ajaxReq.done(function(data,status,xhr){
-            xaxisGeneration = data.index;
-            yaxisGeneration = data.value;
-           
+            xaxisGeneration = data.Generation.index;
+            yaxisGeneration = data.Generation.value;
+            
+            xaxisGenerationForecast = data.GenerationForecast.index;
+            yaxisGenerationForecast = data.GenerationForecast.value;
+            
+            $('#RMSE').html('The RMSE error is '+ (data.RMSE).toFixed(2) + '%') 
             var GenerationDataReliable = true;
 yaxisGeneration.forEach( (entry) => {
     if(isNaN(entry)){
@@ -226,9 +258,25 @@ var generation = {
     y:yaxisGeneration ,
     type: 'scatter',
   name:'generation',
+  line:{
+      width:5
+  }
   
 }
+var generationForecast = {
+    x:xaxisGenerationForecast,
+    y:yaxisGenerationForecast,
+    type: 'scatter',
+  name:'Generation Forecast',
+  line:{
+      width:5
+  },marker:{
+      color:'rgb(195,155,211)'
+  }
+}
+//var dataGeneration = [generation,generationForecast]
 var dataGeneration = [generation]
+
 var layout = {
   title: {
       text:'Actual Generation for '+ '{{date}}' + ' for ' + '{{upperFirst owner}}',
@@ -259,7 +307,8 @@ var layout = {
   },
   legend: {
     font: {size: 18},
-    yref: 'paper'
+    yref: 'paper',
+    orientation:'h'
   }
 }
 Plotly.newPlot('generationPlot', dataGeneration, layout, {showSendToCloud: true});
@@ -283,7 +332,14 @@ var ECMWFERROR = {
     name:'Error ECMWF',
     yaxis:'y2'
 }
-var data = [IITMERROR,ECMWFERROR]
+var ForeCastError =  {
+    x:xaxisMyForecast,
+    y:YAxisErrorData(yaxisACTUAL,yaxixMyForecast),
+    type:'scatter',
+    name:'ERROR FORECAST',
+    yaxis:'y2'
+}
+var data = [ForeCastError]
 var Errorlayout = {
   title:{
       text:'Error plot for date '+ '{{date}}' + ' for ' + '{{upperFirst owner}}',

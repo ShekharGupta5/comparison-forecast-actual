@@ -1,6 +1,7 @@
 require('../database/mongo-connection');
 
 const GenerationModel = require('../model/GenerationModel')
+const RMSE = require('../functions/GeneralFunction').RMSE;
 
 async function FetchData(fromdate,parameter,provider,owner){
  formatedStrin = String( fromdate.getFullYear() + '-' +('0' + (fromdate.getMonth() + 1)).slice(-2)+ '-' +('0' + fromdate.getDate()).slice(-2) ) 
@@ -13,6 +14,8 @@ async function FetchData(fromdate,parameter,provider,owner){
    
 
  const ForecastModel = require('../model/ForecastModel').Forecast;
+
+
  var result = await ForecastModel().find({
        timestamp:{
            $gte:new Date(formatedStrin),
@@ -30,6 +33,13 @@ async function FetchData(fromdate,parameter,provider,owner){
    returnDataObj['IITM'] = TrasnformData(bifurcatedResult['IITM'])
    returnDataObj['ECMWF'] = TrasnformData(bifurcatedResult['ECMWF'])
    returnDataObj['ACTUAL'] = TrasnformData(bifurcatedResult['ACTUAL'])
+   
+   ActualObject = {...returnDataObj['ACTUAL']}
+   //Objects are passed by reference in js, so need to create a new object
+   //Need to make a separate variable because otherwise it is over writing returnDataObj['ACTUAL']
+   returnDataObj['MYForecast'] =  MYForecast(ActualObject)
+   
+
    return await returnDataObj;
 }
 function BifurcateProvider(resultSet){
@@ -105,8 +115,16 @@ async function FetchGenerationData(fromdate,parameter,provider,owner){
        },
        owner:owner
    })
+   returnDataObj = {};
+   returnDataObj['Generation'] = TrasnformData(result);
+
+   ActualObject = {...returnDataObj['Generation']}
+   //Objects are passed by reference in js, so need to create a new object
+   //Need to make a separate variable because otherwise it is over writing returnDataObj['ACTUAL']
+   returnDataObj['GenerationForecast'] =  MYForecast(ActualObject)
+   returnDataObj['RMSE'] = RMSE(returnDataObj['Generation'].value,returnDataObj['GenerationForecast'].value,250)
    
-   return TrasnformData(result);
+   return returnDataObj;
 }
 
 
@@ -124,6 +142,121 @@ async function NewDbPatch(){
     })
 }
 
+function MYForecast(data){
+    pointC = []
+    pointC.push
+//    console.log('The before values are ',data.value)
+   for(var i=0;i<96;i++){
+    if(i==0 || i==1){
+       pointC.push(data.value[i]) 
+    }else{
+        APoint = data.value[i-2];
+        BPoint = data.value[i-1];
+        // curvefactor = Math.sqrt(BPoint/APoint);
+        curvefactor = BPoint/APoint;
+        considerAlpha = false;
+        alpha = 0
+        alphaCurveFactorConsideration = 0.05 //that is 10%
+        if(considerAlpha){
+            if(curvefactor<1){
+                alpha = - (alphaCurveFactorConsideration)*curvefactor;
+            }
+            else if(curvefactor>1){
+                alpha = (alphaCurveFactorConsideration)*curvefactor;
+            }
+        }
+        if(isNaN(curvefactor) || curvefactor == Infinity){
+            curvefactor = 0;
+        }
+        if(curvefactor>2.25){
+            curvefactor = 2.25;//limit so that spikes can be reduced.
+        }
+        if(curvefactor < 0.625){
+            curvefactor = 0.625 //limit so that spikes can reduced ,it is difficult to drop more rapid that this value.
+        }
+        
+        CPoint = (curvefactor-alpha)*BPoint; //Cpoint is Forecasted Point
+        pointC.push(CPoint);
+        
+    }
+}
+    //just shifting a timeblock to left
+    shiftingLeft = false
+    if(shiftingLeft){
+        console.log('nO')
+        for(var j=0;j<96;j++){
+            if(j==0){
+                //do nothing
+            }
+            else{
+                temp = pointC[j];
+                pointC[j-1] = temp;
+            }
+        }
+    }
+    data.value = pointC;
+    //  console.log('After values',data.value)
+    
+    return data;
+ 
+}
+function MYForecast2(data){
+    pointC = []
+    pointC.push
+//    console.log('The before values are ',data.value)
+   for(var i=0;i<96;i++){
+    if(i==0 || i==1 || i==2 || i==3){
+       pointC.push(data.value[i]) 
+    }else{
+        APoint = data.value[i-4];
+        BPoint = data.value[i-3];
+        // curvefactor = Math.sqrt(BPoint/APoint);
+        curvefactor = BPoint/APoint;
+        considerAlpha = false;
+        alpha = 0
+        alphaCurveFactorConsideration = 0.05 //that is 10%
+        if(considerAlpha){
+            if(curvefactor<1){
+                alpha = - (alphaCurveFactorConsideration)*curvefactor;
+            }
+            else if(curvefactor>1){
+                alpha = (alphaCurveFactorConsideration)*curvefactor;
+            }
+        }
+        if(isNaN(curvefactor) || curvefactor == Infinity){
+            curvefactor = 0;
+        }
+        if(curvefactor>2.25){
+            curvefactor = 2.25;//limit so that spikes can be reduced.
+        }
+        if(curvefactor < 0.625){
+            curvefactor = 0.625 //limit so that spikes can reduced ,it is difficult to drop more rapid that this value.
+        }
+        CPoint = (curvefactor-alpha)*BPoint; //Cpoint is Forecasted Point
+        pointC.push(CPoint);
+        
+    }
+}
+    //just shifting a timeblock to left
+    shiftingLeft = false
+    if(shiftingLeft){
+        console.log('nO')
+        for(var j=0;j<96;j++){
+            if(j==0){
+                //do nothing
+            }
+            else{
+                temp = pointC[j];
+                pointC[j-1] = temp;
+            }
+        }
+    }
+    data.value = pointC;
+    //  console.log('After values',data.value)
+    
+    return data;
+ 
+}
 module.exports.FetchGenerationData = FetchGenerationData
 module.exports.TrasnformData = TrasnformData;
 module.exports.FetchData = FetchData;
